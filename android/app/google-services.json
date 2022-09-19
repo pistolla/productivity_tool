@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "803611908381",
+    "project_id": "remotesurveyapp",
+    "storage_bucket": "remotesurveyapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803611908381:android:d1f0a3ee668b68d20169f4",
+        "android_client_info": {
+          "package_name": "com.example.remotesurveyadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803611908381-7qmlepfansf3sd9pmvpb67bmcb6e997g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRa4MeyI2cjyn4dzT_G--3HFHdFOp6a4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803611908381-7qmlepfansf3sd9pmvpb67bmcb6e997g.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "803611908381-ip5eiqo1rsq2taaqibecu6en00vcljfa.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.remotesurveyadmin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

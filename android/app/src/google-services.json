@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "516785844140",
+    "project_id": "reactsurvey-b0c33",
+    "storage_bucket": "reactsurvey-b0c33.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516785844140:android:71d8c7e32209d899a39409",
+        "android_client_info": {
+          "package_name": "com.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "516785844140-qvgos9f3ontqffq4v6v45q9b8v56784t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCi5XhPxoRWOcys9AR554jy7cuHPqsNh0o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "516785844140-qvgos9f3ontqffq4v6v45q9b8v56784t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516785844140:android:6eb4c6e8ef30f1c5a39409",
+        "android_client_info": {
+          "package_name": "com.example.remotesurveyadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "516785844140-qvgos9f3ontqffq4v6v45q9b8v56784t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCi5XhPxoRWOcys9AR554jy7cuHPqsNh0o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "516785844140-qvgos9f3ontqffq4v6v45q9b8v56784t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
