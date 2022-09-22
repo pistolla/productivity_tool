@@ -16,7 +16,7 @@ class DateFormatterUtil {
   }
 
   String serverFormattedDate(DateTime? date) {
-    return date != null ? DateFormat("dd-MM-yyyy", "en_US").format(date) : "";
+    return date != null ? DateFormat("dd-MM-yyyy H:mm:s", "en_US").format(date) : "";
   }
 
   String formatInterval({

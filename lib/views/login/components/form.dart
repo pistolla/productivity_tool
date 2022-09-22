@@ -3,9 +3,9 @@ import 'package:remotesurveyadmin/data/blocs/global/global_bloc.dart';
 import 'package:remotesurveyadmin/data/blocs/global/global_event.dart';
 import 'package:remotesurveyadmin/storage/session.dart';
 import 'package:remotesurveyadmin/storage/storage_keys.dart';
+import 'package:remotesurveyadmin/views/dashboard/dashboard_view.dart';
 import 'package:remotesurveyadmin/widgets/adaptive/alert_dialog/adaptive_alert_dialog_factory.dart';
 import 'package:remotesurveyadmin/views/forgot_password/forgot_password_view.dart';
-import 'package:remotesurveyadmin/views/home/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:remotesurveyadmin/widgets/form_error.dart';
 import 'package:remotesurveyadmin/widgets/no_account_text.dart';
@@ -217,7 +217,7 @@ class _SignFormState extends State<SignForm> {
     showProcessDialog(context);
     AuthService service = AuthService();
 
-    service.authenticate({"email": email, "password": password}).then(
+    service.authenticate({"email": email, "password": password, "name": "", "phone": ""}).then(
       (value) => {
         Future.delayed(const Duration(milliseconds: 3000), () {
           if (value.serverResponse != null) {
@@ -247,7 +247,7 @@ class _SignFormState extends State<SignForm> {
 
               context.read<GlobalBloc>().add(SessionStarted());
               Navigator.pop(context);
-              Navigator.pushNamed(context, HomeView.routeName);
+              Navigator.pushNamed(context, DashboardView.routeName);
             }
           } else {
             debugPrint("error response ${value.error}");

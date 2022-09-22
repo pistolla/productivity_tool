@@ -1,33 +1,44 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dynamic_forms/flutter_dynamic_forms.dart';
-import 'package:remotesurveyadmin/models/survey_model.dart';
+import 'package:remotesurveyadmin/api/firestore_service.dart';
+import 'package:remotesurveyadmin/helper/date_formatter_util.dart';
+import 'package:remotesurveyadmin/models/notification_model.dart';
+import 'package:remotesurveyadmin/storage/session.dart';
 import 'package:remotesurveyadmin/views/dynamic_form/dynamic_form_view.dart';
+import 'package:remotesurveyadmin/views/dynamic_form/body/transition_form_builder.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:dynamic_forms/dynamic_forms.dart';
+import 'package:flutter_dynamic_forms_components/flutter_dynamic_forms_components.dart'
+    as components;
 
 import '../data/blocs/form/dynamic_form_bloc.dart';
 import '../views/dynamic_form/body/custom_form_manager.dart';
+import 'form_model.dart';
 
-class SurveyDataSource extends DataGridSource {
-  /// Creates the employee data source class with required details.
-  SurveyDataSource({required List<Survey> employeeData}) {
-    _employeeData = employeeData
+class FormDataSource extends DataGridSource {
+  FormDataSource({required List<FormModel> formData}) {
+    _cloudForms = formData
         .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell<int>(columnName: 'id', value: e.id),
-              DataGridCell<String>(columnName: 'name', value: e.name),
+              DataGridCell<String>(columnName: 'title', value: e.title),
               DataGridCell<String>(
-                  columnName: 'designation', value: e.dateCreated),
-              DataGridCell<int>(columnName: 'questions', value: e.questions),
-              DataGridCell<int>(columnName: 'answers', value: e.answers),
-              const DataGridCell<String>(columnName: 'action', value: null),
+                  columnName: 'description', value: e.description),
+              DataGridCell<Map>(columnName: 'rules', value: e.rules),
+              DataGridCell<int>(columnName: 'answers', value: e.data.length),
+              DataGridCell<Map>(
+                  columnName: 'action',
+                  value: {"id": e.documentId, "title": e.title, "tabs": e.getTabs()}),
             ]))
         .toList();
   }
 
-  List<DataGridRow> _employeeData = [];
+  List<DataGridRow> _cloudForms = [];
 
   @override
-  List<DataGridRow> get rows => _employeeData;
+  List<DataGridRow> get rows => _cloudForms;
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
@@ -41,24 +52,71 @@ class SurveyDataSource extends DataGridSource {
                   builder: (BuildContext context, BoxConstraints constraints) {
                   return ElevatedButton(
                       onPressed: () {
+                        Session session = Session();
+                        session.getUserID().then((userId) {
+                          session.getUsername().then((value) {
+                            var message =
+                                "user has started filing form ${e.value["title"]} ";
+                            var timestamp = Timestamp.fromDate(DateTime.now());
+                            var user_id = userId;
+                            var reference = e.value["id"];
+
+                            FirestoreService service = FirestoreService();
+                            service.createNotification(NotificationModel(
+                                id: '',
+                                message: message,
+                                date_created: timestamp,
+                                reference: reference,
+                                user_id: user_id));
+                          });
+                        });
+                        var formBuilder = FormBuilder(
+                          JsonFormParserService(
+                            components.getDefaultParserList(),
+                          ),
+                        );
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FormProvider(
-                              create: (_) => CustomFormManager(),
-                              child: BlocProvider(
+                            builder: (context) => BlocProvider(
                                 create: (context) {
-                                  return DynamicFormBloc(
-                                      FormProvider.of<CustomFormManager>(context));
+                                  return DynamicFormBloc(formBuilder,
+                                      TransitionFormBuilder(formBuilder));
                                 },
-                                child: const DynamicFormView(),
+                                child: DynamicFormView(
+                                  documentId: e.value["id"],
+                                  title: e.value["title"],
+                                  tabs: e.value["tabs"],
+                                ),
                               ),
-                            ),
+
                           ),
                         );
-                      }, child: const Text('Fill Form', style: TextStyle(overflow: TextOverflow.visible),));
+                      },
+                      child: const Text(
+                        'Fill Form',
+                        style: TextStyle(overflow: TextOverflow.visible),
+                      ));
                 })
-              : Text(e.value.toString()));
+              : e.columnName == 'rules'
+                  ? LayoutBuilder(builder:
+                      (BuildContext context, BoxConstraints constraints) {
+                      var ruleMap = e.value as Map;
+                      return Row(
+                        children: [
+                          ...ruleMap.entries.map((entry) {
+                            if (entry.value is Timestamp) {
+                              var val = DateFormatterUtil().serverFormattedDate(
+                                  DateTime.parse(
+                                      entry.value.toDate().toString()));
+                              return Text('${entry.key}: $val ');
+                            }
+                            return Text('${entry.key}: ${entry.value} ');
+                          })
+                        ],
+                      );
+                    })
+                  : Text(e.value.toString()));
     }).toList());
   }
 }

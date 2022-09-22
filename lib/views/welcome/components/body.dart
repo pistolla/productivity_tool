@@ -10,6 +10,7 @@ import 'package:remotesurveyadmin/storage/secure_storage.dart';
 import 'package:remotesurveyadmin/storage/session.dart';
 import 'package:remotesurveyadmin/storage/storage_keys.dart';
 import 'package:remotesurveyadmin/storage/token_storage.dart';
+import 'package:remotesurveyadmin/views/dashboard/dashboard_view.dart';
 import 'package:remotesurveyadmin/views/login/login_view.dart';
 import 'package:remotesurveyadmin/views/onboard/onboard_view.dart';
 import 'package:flutter/material.dart';
@@ -107,7 +108,7 @@ class _BodyState extends State<Body> with SingleTickerProviderStateMixin {
                                                                 () {
                                                               Navigator.pushNamed(
                                                                   context,
-                                                                  HomeView
+                                                                  DashboardView
                                                                       .routeName);
                                                             })
                                                           }

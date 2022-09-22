@@ -5,10 +5,10 @@ import 'package:remotesurveyadmin/config/enums.dart';
 import 'package:remotesurveyadmin/widgets/drawer_nav.dart';
 import 'components/body.dart';
 
-class HomeView extends StatelessWidget {
-  static String routeName = "/home";
+class AnswerView extends StatelessWidget {
+  static String routeName = "/answers";
 
-  const HomeView({super.key});
+  const AnswerView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class HomeView extends StatelessWidget {
       drawer: const DashboardDrawerView(),
       bottomNavigationBar: const SizedBox(
           height: customBottomNavigationBarHeight,
-          child: CustomBottomNavBar(selectedMenu: MenuState.home)),
+          child: CustomBottomNavBar(selectedMenu: MenuState.answers)),
     );
   }
 }

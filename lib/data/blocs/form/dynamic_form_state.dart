@@ -6,29 +6,26 @@ import 'package:meta/meta.dart';
 class DynamicFormState {
   final Form? form;
 
-  final bool isLoading;
-
+  final bool isInTranstion;
+  final int selectedForm;
   final bool isValid;
-
   final List<FormPropertyValue> resultProperties;
-
   bool get isEmpty => form!.children.isEmpty;
 
-  DynamicFormState(
+  const DynamicFormState(
       {this.form,
-      this.isLoading = false,
-      this.isValid = false,
-      this.resultProperties = const []});
+        this.isInTranstion = false,
+        this.isValid = false,
+        this.selectedForm = 0,
+        this.resultProperties = const []});
 
   DynamicFormState copyWith(
-      {Form? form,
-      bool? isLoading,
-      bool? isValid,
-      List<FormPropertyValue>? resultProperties}) {
+      {Form? form, bool? isInTransition, bool? isValid, int? selectedForm,List<FormPropertyValue>? resultProperties}) {
     return DynamicFormState(
         form: form ?? this.form,
-        isLoading: isLoading ?? this.isLoading,
+        isInTranstion: isInTransition ?? isInTranstion,
         isValid: isValid ?? this.isValid,
+        selectedForm: selectedForm ?? this.selectedForm,
         resultProperties: resultProperties ?? this.resultProperties);
   }
 }

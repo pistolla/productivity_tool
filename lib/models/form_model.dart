@@ -1,13 +1,16 @@
 
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FormModel {
   String documentId;
   String title;
   String description;
-  String form;
+  List form;
   List data;
   Map rules;
+  Timestamp published_on;
 
   FormModel(
       {required this.documentId,
@@ -15,7 +18,8 @@ class FormModel {
       required this.description,
       required this.form,
       required this.data,
-      required this.rules});
+      required this.rules,
+        required this.published_on});
 
   factory FormModel.fromMap(Map<String, dynamic> data) {
     return FormModel(
@@ -24,7 +28,19 @@ class FormModel {
         description: data["description"],
         form: data["form"],
         data: data["data"],
+        published_on: data["published_on"],
         rules: data["rules"]);
+  }
+
+  factory FormModel.dummy() {
+    return FormModel(
+        documentId: "",
+        title: "",
+        description: "",
+        form: [],
+        data: [],
+        published_on: Timestamp(1, 1000),
+        rules: {});
   }
 
   factory FormModel.fromSnapShot(DocumentSnapshot data) {
@@ -34,7 +50,19 @@ class FormModel {
         description: data["description"],
         form: data["form"],
         data: data["data"],
+        published_on: data["published_on"],
         rules: data["rules"]);
+  }
+
+  List<String> getTabs() {
+    List<String> values = [];
+    for (var element in form) {
+      var decoded = json.decode(element);
+      if(decoded != null){
+        values.add(decoded["id"]);
+      }
+    }
+    return values;
   }
 
   Map<String, Object?> toMap() {

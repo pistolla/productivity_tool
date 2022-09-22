@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:remotesurveyadmin/data/blocs/global/global_bloc.dart';
 import 'package:remotesurveyadmin/data/blocs/global/global_state.dart';
 import 'package:flutter/material.dart';
+import 'package:remotesurveyadmin/views/answers/answer_view.dart';
 import 'package:remotesurveyadmin/views/home/home_view.dart';
 import 'package:remotesurveyadmin/views/profile/profile_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,24 +11,23 @@ import '../config/constants.dart';
 import '../config/enums.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
-  CustomBottomNavBar({Key? key, required this.selectedMenu})
-      : super(key: key) {
-  }
+  const CustomBottomNavBar({Key? key, required this.selectedMenu})
+      : super(key: key);
 
   final MenuState selectedMenu;
 
   @override
   Widget build(BuildContext context) {
-    final Color inActiveIconColor = Color(0xFFB6B6B6);
+    const Color inActiveIconColor = Color(0xFFB6B6B6);
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            offset: Offset(0, -15),
+            offset: const Offset(0, -15),
             blurRadius: 20,
-            color: Color(0xFFDADADA).withOpacity(0.85),
+            color: const Color(0xFFDADADA).withOpacity(0.85),
           ),
         ],
         borderRadius: const BorderRadius.only(
@@ -44,7 +44,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 child: Column(children: [
                   IconButton(
                     icon: Icon(
-                      Icons.edit,
+                      Icons.file_copy_outlined,
                       color: MenuState.home == selectedMenu
                           ? kPrimaryColor
                           : inActiveIconColor,
@@ -64,51 +64,17 @@ class CustomBottomNavBar extends StatelessWidget {
                   IconButton(
                     icon: Icon(
                       Icons.question_answer,
-                      color: MenuState.meters == selectedMenu
+                      color: MenuState.answers == selectedMenu
                           ? kPrimaryColor
                           : inActiveIconColor,
                     ),
                     onPressed: () {
-
+                      Navigator.pushNamed(context, AnswerView.routeName);
                     },
                   ),
                   Text('Answers',
                       style: TextStyle(
-                          color: MenuState.meters == selectedMenu
-                              ? kPrimaryColor
-                              : inActiveIconColor)),
-                ]),
-              ),
-              Flexible(
-                child: Column(children: [
-                  IconButton(
-                    icon: Icon(Icons.bar_chart,
-                        color: MenuState.meters == selectedMenu
-                            ? kPrimaryColor
-                            : inActiveIconColor),
-                    onPressed: () {
-                    },
-                  ),
-                  Text('Chart',
-                      style: TextStyle(
-                          color: MenuState.meters == selectedMenu
-                              ? kPrimaryColor
-                              : inActiveIconColor)),
-                ]),
-              ),
-              Flexible(
-                child: Column(children: [
-                  IconButton(
-                    icon: Icon(Icons.settings,
-                        color: MenuState.meters == selectedMenu
-                            ? kPrimaryColor
-                            : inActiveIconColor),
-                    onPressed: () {
-                    },
-                  ),
-                  Text('Settings',
-                      style: TextStyle(
-                          color: MenuState.meters == selectedMenu
+                          color: MenuState.answers == selectedMenu
                               ? kPrimaryColor
                               : inActiveIconColor)),
                 ]),

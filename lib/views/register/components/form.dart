@@ -70,9 +70,7 @@ class _SignUpFormState extends State<SignUpForm> {
           SizedBox(height: getProportionateScreenHeight(40)),
           GestureDetector(
             onTap: () {
-              Future.delayed(Duration.zero, () {
-                Navigator.pushNamed(context, HomeView.routeName);
-              });
+
             },
             child: Text(
               'By signing up, you confirm that you agree \nwith our Term and Condition (Bypass to home)',
@@ -385,7 +383,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 });
                 Session session = Session();
                 session.storeIsFirstLaunch(isFirstLaunch: true);
-                session.storeUsername(userName: "$first_name $last_name");
+                session.storeUsername(userName: "$first_name");
                 session.storeUserphone(userPhone: phone.toString());
                 session.storeUserID(userID: value.serverResponse.data["user"]);
                 session.tokens

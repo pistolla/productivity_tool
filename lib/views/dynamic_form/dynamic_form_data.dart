@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:remotesurveyadmin/config/constants.dart';
-import 'package:remotesurveyadmin/views/dynamic_form/body/dynamic_form_screen.dart';
 
-class DynamicFormView extends StatelessWidget {
-  static String routeName = "/dynamic_form";
+import 'body/dynamic_form_data_screen.dart';
+
+
+class DynamicFormDataView extends StatelessWidget {
+  static String routeName = "/dynamic_form_data";
   final String documentId;
   final String title;
   final List<String> tabs;
-
-  const DynamicFormView(
-      {required this.documentId,
-      required this.title,
-      required this.tabs,
-      super.key});
-
+  const DynamicFormDataView({required this.documentId, required this.title,required this.tabs, super.key});
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -30,8 +26,8 @@ class DynamicFormView extends StatelessWidget {
             isScrollable: true,
             tabs: [
               ...tabs.map((e) => Tab(
-                    text: e,
-                  ))
+                text: e,
+              ))
             ],
           ),
         ),
@@ -39,8 +35,8 @@ class DynamicFormView extends StatelessWidget {
           children: [
             ...tabs.map((value) {
               var index = tabs.indexOf(value);
-              return DynamicFormScreen(
-                  documentId: documentId, formNumber: index, title: title);
+              return DynamicFormDataScreen(
+                  documentId: documentId, formNumber: index);
             })
           ],
         ),

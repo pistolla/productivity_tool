@@ -47,13 +47,13 @@ class AuthService extends UserResource {
         password: params["password"],
       );
       final user = userCredential.user;
-      if (user != null) {
-        debugPrint(user.uid);
-        debugPrint(user.tenantId);
+      if(user != null && params["phone"].toString().isNotEmpty && params["name"].toString().isNotEmpty){
+        user.updatePhoneNumber(params["phone"]);
+        user.updateDisplayName(params["name"]);
       }
       return ResponseData<Response>.success(Response(
           status: 0,
-          statusDesc: 'User created Successfully',
+          statusDesc: 'Login Successful',
           data: {"user": user?.uid, "token": user?.uid}));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {

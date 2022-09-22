@@ -1,26 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dynamic_forms/dynamic_forms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart' as flutter;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:remotesurveyadmin/api/firestore_service.dart';
 import 'package:remotesurveyadmin/data/blocs/form/dynamic_form_bloc.dart';
 import 'package:remotesurveyadmin/data/blocs/form/dynamic_form_event.dart';
 import 'package:remotesurveyadmin/data/blocs/form/dynamic_form_state.dart';
-import 'package:remotesurveyadmin/models/notification_model.dart';
-import 'package:remotesurveyadmin/storage/session.dart';
-import 'package:remotesurveyadmin/views/dynamic_form/body/dynamic_form_container.dart';
 
-class DynamicFormScreen extends StatelessWidget {
+import 'dynamic_form_data_container.dart';
+
+
+class DynamicFormDataScreen extends StatelessWidget {
   final String documentId;
   final int formNumber;
-  final String title;
-
-  const DynamicFormScreen(
-      {super.key,
-      required this.documentId,
-      required this.formNumber,
-      required this.title});
+  const DynamicFormDataScreen({super.key, required this.documentId, required this.formNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +29,8 @@ class DynamicFormScreen extends StatelessWidget {
               builder: (context, state) {
                 return Column(
                   children: [
-                    DynamicFormContainer(
-                        documentId: documentId, formNumber: formNumber),
-                    if (!state.isInTranstion)
-                      DynamicFormButtonRow(title, documentId, state)
+                    DynamicFormDataContainer(documentId: documentId, formNumber: formNumber),
+                    if (!state.isInTranstion) DynamicFormButtonRow(state)
                   ],
                 );
               },
@@ -66,15 +56,16 @@ class DynamicFormScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               //map List of our data to the ListView
               children: resultPropertyValues
-                  .map((riv) => flutter.Text('${riv.id}: ${riv.value}'))
+                  .map((riv) =>
+                  flutter.Text('${riv.id}: ${riv.value}'))
                   .toList(),
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const flutter.Text('Post to Firestore'),
+              child: const flutter.Text('Ok'),
               onPressed: () {
-                bloc.add(PostFormDataEvent(documentId: documentId));
+                bloc.add(ClearFormDataEvent());
                 Navigator.of(context).pop();
               },
             )
@@ -87,15 +78,11 @@ class DynamicFormScreen extends StatelessWidget {
 
 class DynamicFormButtonRow extends StatelessWidget {
   final DynamicFormState state;
-  final String documentId;
-  final String title;
 
   const DynamicFormButtonRow(
-    this.title,
-    this.documentId,
-    this.state, {
-    Key? key,
-  }) : super(key: key);
+      this.state, {
+        Key? key,
+      }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -113,24 +100,6 @@ class DynamicFormButtonRow extends StatelessWidget {
             ],
           ),
           onPressed: () {
-            Session session = Session();
-            session.getUserID().then((userId) {
-              session.getUsername().then((value) {
-                var message =
-                    "user has quit filing form $title ";
-                var timestamp = Timestamp.fromDate(DateTime.now());
-                var user_id = userId;
-                var reference = documentId;
-
-                FirestoreService service = FirestoreService();
-                service.createNotification(NotificationModel(
-                    id: '',
-                    message: message,
-                    date_created: timestamp,
-                    reference: reference,
-                    user_id: user_id));
-              });
-            });
             Navigator.pop(context);
           },
         ),
@@ -151,8 +120,8 @@ class DynamicFormButtonRow extends StatelessWidget {
         OutlinedButton(
           onPressed: state.isValid
               ? () {
-                  bloc.add(RequestFormDataEvent());
-                }
+            bloc.add(RequestFormDataEvent());
+          }
               : null,
           child: Row(
             children: <Widget>[
@@ -169,3 +138,5 @@ class DynamicFormButtonRow extends StatelessWidget {
     );
   }
 }
+
+

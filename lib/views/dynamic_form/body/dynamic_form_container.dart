@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dynamic_forms/flutter_dynamic_forms.dart';
@@ -10,15 +9,28 @@ import 'package:remotesurveyadmin/data/blocs/form/dynamic_form_state.dart';
 import 'custom_form_manager.dart';
 
 class DynamicFormContainer extends StatefulWidget {
+  final String documentId;
+  final int formNumber;
+
+  const DynamicFormContainer(
+      {super.key, required this.documentId, required this.formNumber});
+
   @override
   _DynamicFormContainerState createState() => _DynamicFormContainerState();
 }
 
 class _DynamicFormContainerState extends State<DynamicFormContainer> {
+  late FormRenderService _formRenderService;
+
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<DynamicFormBloc>(context).add(LoadFormEvent());
+    _formRenderService = FormRenderService(
+      renderers: getRenderers(),
+      dispatcher: BlocProvider.of<DynamicFormBloc>(context).add,
+    );
+    BlocProvider.of<DynamicFormBloc>(context).add(LoadFormEvent(
+        documentId: widget.documentId, formNumber: widget.formNumber));
   }
 
   @override
@@ -33,10 +45,7 @@ class _DynamicFormContainerState extends State<DynamicFormContainer> {
         }
         return Center(
           child: SingleChildScrollView(
-              child: FormRenderer<CustomFormManager>(
-            renderers: getRenderers(),
-            dispatcher: BlocProvider.of<DynamicFormBloc>(context).add,
-          )),
+              child: _formRenderService.render(state.form!, context)),
         );
       },
     );

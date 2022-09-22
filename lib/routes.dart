@@ -1,7 +1,8 @@
 // We use name route
 // All our routes will be available here
+import 'package:remotesurveyadmin/views/answers/answer_view.dart';
 import 'package:remotesurveyadmin/views/complete_profile/complete_profile_view.dart';
-import 'package:remotesurveyadmin/views/dynamic_form/dynamic_form_view.dart';
+import 'package:remotesurveyadmin/views/dashboard/dashboard_view.dart';
 import 'package:remotesurveyadmin/views/forgot_password/forgot_password_view.dart';
 import 'package:remotesurveyadmin/views/home/home_view.dart';
 import 'package:remotesurveyadmin/views/login/login_view.dart';
@@ -29,5 +30,6 @@ final Map<String, WidgetBuilder> routes = {
   AccountView.routeName: (context) => AccountView(),
   SettingView.routeName: (context) => SettingView(),
   CompleteProfileView.routeName: (context) => CompleteProfileView(),
-  DynamicFormView.routeName: (context) => const DynamicFormView()
+  DashboardView.routeName: (context) => const DashboardView(),
+  AnswerView.routeName: (context) =>  AnswerView()
 };

@@ -1,29 +1,30 @@
+import 'package:remotesurveyadmin/api/firestore_service.dart';
 import 'package:remotesurveyadmin/config/size_config.dart';
+import 'package:remotesurveyadmin/models/form_model.dart';
 import 'package:remotesurveyadmin/models/survey_data_source.dart';
-import 'package:remotesurveyadmin/models/survey_model.dart';
 import 'package:remotesurveyadmin/views/home/components/section_title.dart';
 import 'package:remotesurveyadmin/config/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-import '../../../helper/date_formatter_util.dart';
-
 class Body extends StatelessWidget {
-  List<Survey> surveys = <Survey>[];
-  late SurveyDataSource surveyDataSorce;
+  final List<FormModel> surveys = <FormModel>[];
+  late FormDataSource surveyDataSorce;
 
-  List<String> _accValues = ["select "];
+  final List<String> _dropDownValues = ["Filter by:"];
 
-  List<String> _dropDownValues = ["Filter by:"];
+  int total = 0;
+
+  Body({super.key});
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: kPrimaryColor,
     ));
-    surveys = getSurveyData();
-    surveyDataSorce = SurveyDataSource(employeeData: surveys);
+    surveyDataSorce = FormDataSource(formData: surveys);
+    FirestoreService service = FirestoreService();
     return SafeArea(
       child: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -35,30 +36,18 @@ class Body extends StatelessWidget {
             snap: false,
             floating: true,
             stretch: true,
-            expandedHeight: 200.0,
+            expandedHeight: 150.0,
             flexibleSpace: FlexibleSpaceBar(
               collapseMode: CollapseMode.pin,
               background: Stack(fit: StackFit.expand, children: <Widget>[
                 Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 5.0),
-                        child: DropdownButton(
-                          iconEnabledColor: Colors.white,
-                          dropdownColor: kPrimaryColor,
-                          items: _accValues
-                              .map((value) => DropdownMenuItem(
-                                  value: value,
-                                  child: Text(
-                                    value,
-                                    style: const TextStyle(color: Colors.white),
-                                  )))
-                              .toList(),
-                          onChanged: (value) {},
-                          isExpanded: false,
-                          value: _accValues.first,
-                        ))),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 15.0),
+                      child: Text("Survey Quizzes",
+                          style: Theme.of(context).textTheme.headline5),
+                    )),
                 Align(
                     alignment: Alignment.center,
                     child: Container(
@@ -67,15 +56,25 @@ class Body extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text("Total quiz",
-                              style:
-                                  TextStyle(color: kTextColor, fontSize: 20.0)),
-                          Text("1",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 40.0,
-                                  fontWeight: FontWeight.bold)),
+                        children: [
+                          StreamBuilder(
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<dynamic> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.active || snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  if (snapshot.hasData) {
+                                    var values = snapshot.data as List;
+                                    return Text("Total ${values.length}",
+                                        style: const TextStyle(
+                                            color: kTextColor, fontSize: 40.0));
+                                  }
+                                }
+                                return Text("Total $total",
+                                    style: const TextStyle(
+                                        color: kTextColor, fontSize: 40.0));
+                              },
+                              stream: service.listenToPostsRealTime())
                         ],
                       ),
                     )),
@@ -95,7 +94,8 @@ class Body extends StatelessWidget {
                           color: Colors.grey.withOpacity(0.2),
                           spreadRadius: 2,
                           blurRadius: 3,
-                          offset: Offset(0, 0), // changes position of shadow
+                          offset:
+                              const Offset(0, 0), // changes position of shadow
                         ),
                       ],
                     ),
@@ -103,6 +103,10 @@ class Body extends StatelessWidget {
                       height: 40, // 40
                       child: Row(
                         children: [
+                          Text("Active Quizzes",
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline6),
+                          const Spacer(),
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10.0, vertical: 5.0),
@@ -116,7 +120,8 @@ class Body extends StatelessWidget {
                                       value: value,
                                       child: Text(
                                         value,
-                                        style: TextStyle(color: kPrimaryColor),
+                                        style: const TextStyle(
+                                            color: kPrimaryColor),
                                       )))
                                   .toList(),
                               onChanged: (value) {},
@@ -124,8 +129,6 @@ class Body extends StatelessWidget {
                               value: _dropDownValues.first,
                             ),
                           ),
-                          const Spacer(),
-                          const Text("Selected drop down")
                         ],
                       ),
                     ),
@@ -135,7 +138,7 @@ class Body extends StatelessWidget {
             ),
             backgroundColor: kPrimaryColor,
             leading: IconButton(
-              icon: const Icon(Icons.home_outlined, color: Colors.white),
+              icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () {},
             ),
             actions: [
@@ -147,13 +150,6 @@ class Body extends StatelessWidget {
             ],
           ),
           SliverToBoxAdapter(
-              child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: SectionTitle(
-                    title: 'Active Survey',
-                    press: () {},
-                  ))),
-          SliverToBoxAdapter(
               child: Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
@@ -162,63 +158,205 @@ class Body extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width,
-                        child: SfDataGrid(
-                          source: surveyDataSorce,
-                          columnWidthMode: ColumnWidthMode.lastColumnFill,
-                          columns: <GridColumn>[
-                            GridColumn(
-                                columnName: 'id',
-                                label: Container(
-                                    padding: const EdgeInsets.all(16.0),
-                                    alignment: Alignment.center,
-                                    child: const Text(
-                                      'ID',
-                                    ))),
-                            GridColumn(
-                                columnName: 'name',
-                                label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text('Quiz name'))),
-                            GridColumn(
-                                columnName: 'designation',
-                                label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: const Text(
-                                      'Date created',
-                                      overflow: TextOverflow.ellipsis,
-                                    ))),
-                            GridColumn(
-                                columnName: 'questions',
-                                label: Container(
-                                    padding: const EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text('No of questions'))),
-                            GridColumn(
-                                columnName: 'answers',
-                                label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text('Answers'))),
-                            GridColumn(
-                                columnName: 'action',
-                                label: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    alignment: Alignment.center,
-                                    child: Text('Action', style: TextStyle(color: Colors.blueAccent),))),
-                          ],
+                        child: StreamBuilder(
+                          stream: service.listenToPostsRealTime(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<dynamic> snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return SfDataGrid(
+                                source: surveyDataSorce,
+                                columnWidthMode: ColumnWidthMode.lastColumnFill,
+                                rowHeight: 65.0,
+                                columns: <GridColumn>[
+                                  GridColumn(
+                                      columnName: 'title',
+                                      label: Container(
+                                          padding: const EdgeInsets.all(16.0),
+                                          alignment: Alignment.center,
+                                          child: const Text(
+                                            'Title',
+                                          ))),
+                                  GridColumn(
+                                      columnName: 'description',
+                                      label: Container(
+                                          padding: const EdgeInsets.all(8.0),
+                                          alignment: Alignment.center,
+                                          child: const Text('Description'))),
+                                  GridColumn(
+                                      columnName: 'rules',
+                                      label: Container(
+                                          padding: const EdgeInsets.all(8.0),
+                                          alignment: Alignment.center,
+                                          child: const Text(
+                                            'Rules',
+                                            overflow: TextOverflow.ellipsis,
+                                          ))),
+                                  GridColumn(
+                                      columnName: 'answers',
+                                      label: Container(
+                                          padding: const EdgeInsets.all(8.0),
+                                          alignment: Alignment.center,
+                                          child: const Text('Answers'))),
+                                  GridColumn(
+                                      columnName: 'action',
+                                      label: Container(
+                                          padding: const EdgeInsets.all(8.0),
+                                          alignment: Alignment.center,
+                                          child: const Text(
+                                            'Action',
+                                            style: TextStyle(
+                                                color: Colors.blueAccent),
+                                          ))),
+                                ],
+                              );
+                            } else if (snapshot.connectionState ==
+                                    ConnectionState.active ||
+                                snapshot.connectionState ==
+                                    ConnectionState.done) {
+                              if (snapshot.hasError) {
+                                return SizedBox(
+                                  width: SizeConfig.screenWidth,
+                                  height: SizeConfig.screenHeight / 2,
+                                  child: Text("Failed to fetch Quiz forms",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium),
+                                );
+                              } else if (snapshot.hasData) {
+                                surveyDataSorce =
+                                    FormDataSource(formData: snapshot.data);
+                                return SfDataGrid(
+                                  source: surveyDataSorce,
+                                  columnWidthMode:
+                                      ColumnWidthMode.lastColumnFill,
+                                  rowHeight: 65.0,
+                                  columns: <GridColumn>[
+                                    GridColumn(
+                                        columnName: 'title',
+                                        label: Container(
+                                            padding: const EdgeInsets.all(16.0),
+                                            alignment: Alignment.center,
+                                            child: const Text(
+                                              'Title',
+                                            ))),
+                                    GridColumn(
+                                        columnName: 'description',
+                                        label: Container(
+                                            padding: const EdgeInsets.all(8.0),
+                                            alignment: Alignment.center,
+                                            child: const Text('Description'))),
+                                    GridColumn(
+                                        columnName: 'rules',
+                                        label: Container(
+                                            padding: const EdgeInsets.all(8.0),
+                                            alignment: Alignment.center,
+                                            child: const Text(
+                                              'Rules',
+                                              overflow: TextOverflow.ellipsis,
+                                            ))),
+                                    GridColumn(
+                                        columnName: 'answers',
+                                        label: Container(
+                                            padding: const EdgeInsets.all(8.0),
+                                            alignment: Alignment.center,
+                                            child: const Text('Answers'))),
+                                    GridColumn(
+                                        columnName: 'action',
+                                        label: Container(
+                                            padding: const EdgeInsets.all(8.0),
+                                            alignment: Alignment.center,
+                                            child: const Text(
+                                              'Action',
+                                              style: TextStyle(
+                                                  color: Colors.blueAccent),
+                                            ))),
+                                  ],
+                                );
+                              } else {
+                                return Column(
+                                  children: [
+                                    SfDataGrid(
+                                      source: surveyDataSorce,
+                                      columnWidthMode:
+                                          ColumnWidthMode.lastColumnFill,
+                                      columns: <GridColumn>[
+                                        GridColumn(
+                                            columnName: 'title',
+                                            label: Container(
+                                                padding:
+                                                    const EdgeInsets.all(16.0),
+                                                alignment: Alignment.center,
+                                                child: const Text(
+                                                  'Title',
+                                                ))),
+                                        GridColumn(
+                                            columnName: 'description',
+                                            label: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                alignment: Alignment.center,
+                                                child:
+                                                    const Text('Description'))),
+                                        GridColumn(
+                                            columnName: 'rules',
+                                            label: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                alignment: Alignment.center,
+                                                child: const Text(
+                                                  'Rules',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ))),
+                                        GridColumn(
+                                            columnName: 'answers',
+                                            label: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                alignment: Alignment.center,
+                                                child: const Text('Answers'))),
+                                        GridColumn(
+                                            columnName: 'action',
+                                            label: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                alignment: Alignment.center,
+                                                child: const Text(
+                                                  'Action',
+                                                  style: TextStyle(
+                                                      color: Colors.blueAccent),
+                                                ))),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                        width: SizeConfig.screenWidth,
+                                        height: SizeConfig.screenHeight / 2,
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          child: Text("No data found",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium),
+                                        ))
+                                  ],
+                                );
+                              }
+                            } else {
+                              return SizedBox(
+                                width: SizeConfig.screenWidth,
+                                height: SizeConfig.screenHeight / 2,
+                                child: Text("State ${snapshot.connectionState}",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium),
+                              );
+                            }
+                          },
                         ),
                       ))))
         ],
       ),
     );
-  }
-
-  List<Survey> getSurveyData() {
-    return [
-      Survey(1, "User survey",
-          DateFormatterUtil().serverFormattedDate(DateTime.now()), 15, 0, 10),
-    ];
   }
 }
