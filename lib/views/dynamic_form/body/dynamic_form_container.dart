@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dynamic_forms/flutter_dynamic_forms.dart';
 import 'package:flutter_dynamic_forms_components/flutter_dynamic_forms_components.dart';
+import 'package:remotesurveyadmin/config/size_config.dart';
 import 'package:remotesurveyadmin/data/blocs/form/dynamic_form_bloc.dart';
 import 'package:remotesurveyadmin/data/blocs/form/dynamic_form_event.dart';
 import 'package:remotesurveyadmin/data/blocs/form/dynamic_form_state.dart';
+import 'package:remotesurveyadmin/helper/form/custom_renderers.dart';
 
 import 'custom_form_manager.dart';
 
@@ -26,7 +28,7 @@ class _DynamicFormContainerState extends State<DynamicFormContainer> {
   void initState() {
     super.initState();
     _formRenderService = FormRenderService(
-      renderers: getRenderers(),
+      renderers: getFormRenderers(),
       dispatcher: BlocProvider.of<DynamicFormBloc>(context).add,
     );
     BlocProvider.of<DynamicFormBloc>(context).add(LoadFormEvent(
@@ -43,9 +45,8 @@ class _DynamicFormContainerState extends State<DynamicFormContainer> {
             child: Center(child: CircularProgressIndicator()),
           );
         }
-        return Center(
-          child: SingleChildScrollView(
-              child: _formRenderService.render(state.form!, context)),
+        return SingleChildScrollView(
+              child: _formRenderService.render(state.form!, context)
         );
       },
     );

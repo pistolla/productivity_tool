@@ -46,3 +46,4 @@ TextTheme textTheme() {
     bodyText2: TextStyle(color: kTextColor)
   );
 }
+

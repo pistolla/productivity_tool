@@ -72,6 +72,12 @@ class DynamicFormScreen extends StatelessWidget {
           ),
           actions: <Widget>[
             TextButton(
+              child: const flutter.Text('Cancel', style: TextStyle(color: Colors.redAccent)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
               child: const flutter.Text('Post to Firestore'),
               onPressed: () {
                 bloc.add(PostFormDataEvent(documentId: documentId));

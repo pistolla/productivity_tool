@@ -21,9 +21,10 @@ class DynamicFormView extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           foregroundColor: kPlainColor,
+          iconTheme: Theme.of(context).iconTheme,
           title: Text(
             title,
-            style: Theme.of(context).textTheme.headline4,
+            style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: kPrimaryColor,
           bottom: TabBar(
@@ -34,6 +35,13 @@ class DynamicFormView extends StatelessWidget {
                   ))
             ],
           ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.settings, color: Colors.white),
+                onPressed: () async {},
+              ),
+              const SizedBox(width: 12),
+            ]
         ),
         body: TabBarView(
           children: [
